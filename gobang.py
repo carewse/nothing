@@ -27,7 +27,7 @@ class Chessboard():
 
     """
 
-    #longNum make the num of x, latNum make the num of y
+    #longNum make the num of x, latNum make the num of y 
     def __init__(self,xAxis,yAxis,gobangNum=5):
         if xAxis<3 or yAxis<2 :
             raise ValueError("chessboard's xAxis or yAxis lt 10")
