@@ -1,0 +1,43 @@
+FROM alpine:3.12
+
+MAINTAINER carewse1986@163.com
+
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
+
+RUN apk update \
+        && apk upgrade \
+        && apk add --no-cache bash yasm ffmpeg python3 py3-pip
+RUN pip3 install pydub
+
+VOLUME /data
+
+WORKDIR /tmp
+
+RUN echo -e '#!/usr/bin/python3\n\
+from pydub import AudioSegment\n\
+from pydub.silence import detect_silence\n\
+import os\n\
+apath = "/data/sli_mp3/"\n\
+if os.path.exists(apath):\n\
+	for fpath in os.listdir(apath):\n\
+		fp = os.path.join(apath,fpath)\n\
+		if os.path.isfile(fp):\n\
+			os.remove(fp)\n\
+else:\n\
+	f = os.mkdir(apath)\n\
+song = AudioSegment.from_mp3("target.mp3")\n\
+start_end = detect_silence(song,300,-35,1)\n\
+start = start_end[0][1]\n\
+n=0;\n\
+for i in start_end[1:]:\n\
+	end = i[0]\n\
+	song[start:end].export(apath+str(n)+".mp3",format="mp3")\n\
+	start = i[1]\n\
+	n=n+1\n' > exec.py
+
+RUN echo 'wget $1 -O target.mp3 && python3 /tmp/exec.py' > exec.sh
+
+ENTRYPOINT ["/bin/sh","exec.sh"]
+
+CMD ["http://tcv.clewm.net/f0ZhdfBuStBT1zwU3OUQUMDT9tQ=/lnxMiLtB_Ra1WpjF2IVY0Zzkgg_0"]
+#CMD ["/bin/sh"]
