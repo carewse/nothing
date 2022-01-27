@@ -1,0 +1,17 @@
+FROM alpine:3.12
+
+MAINTAINER carewse1986@163.com
+
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
+
+RUN apk update \
+        && apk upgrade \
+	&& apk add --no-cache --virtual .build-deps binutils-gold curl g++ gcc gnupg libgcc linux-headers make libffi-dev openssl-dev python3 python3-dev py3-pip rust cargo\
+        && rm -rf /var/cache/apk/*
+
+RUN pip3 install webssh -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+RUN apk del .build-deps
+EXPOSE 80/tcp 22/tcp 443/tcp 8000/tcp
+
+ENTRYPOINT  ["wssh", "--port=80", "FOREGROUND"]
