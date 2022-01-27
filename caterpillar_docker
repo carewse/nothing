@@ -6,8 +6,12 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositorie
 
 RUN apk update \
         && apk upgrade \
-        && apk add --no-cache bash yasm ffmpeg python3 py3-pip
+        && apk add --no-cache --virtual .build-deps bash yasm ffmpeg python3 py3-pip \
+	&& rm -rf /var/cache/apk/*
+	
 RUN pip3 install pydub
+
+RUN apk del .build-deps
 
 VOLUME /data
 
